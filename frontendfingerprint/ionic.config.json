@@ -1,0 +1,7 @@
+{
+  "name": "frontendfingerprint",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
