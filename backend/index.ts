@@ -10,10 +10,33 @@ const port = process.env.PORT
 app.use(cors())
 app.use(express.json())
 
-app.get("/:id", async (req: Request, res: Response) => {
+const employeeList: any = [
+	{
+		id: "1232",
+		name: "Navani",
+		fingerPrint: null,
+	},
+	{
+		id: "4571",
+		name: "Sundar",
+		fingerPrint: "abcsdX5623784ghsd",
+	},
+	{
+		id: "7820",
+		name: "Yogesh",
+		fingerPrint: null,
+	},
+]
+
+app.get("/:id", (req: Request, res: Response) => {
 	const {id} = req.params
-	console.log("id:;", id)
-	res.json({data: "hello"})
+	const getEmployeeDetails = employeeList.find((employee: any) => {
+		return employee.id === id ? employee : null
+	})
+
+	console.log("getEmployeeDetails ::", getEmployeeDetails)
+
+	res.json({data: getEmployeeDetails})
 })
 
 app.listen(port, () => {

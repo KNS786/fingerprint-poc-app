@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,11 +11,31 @@ const app = (0, express_1.default)();
 const port = process.env.PORT;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-app.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const employeeList = [
+    {
+        id: "1232",
+        name: "Navani",
+        fingerPrint: null,
+    },
+    {
+        id: "4571",
+        name: "Sundar",
+        fingerPrint: "abcsdX5623784ghsd",
+    },
+    {
+        id: "7820",
+        name: "Yogesh",
+        fingerPrint: null,
+    },
+];
+app.get("/:id", (req, res) => {
     const { id } = req.params;
-    console.log("id:;", id);
-    res.json({ data: "hello" });
-}));
+    const getEmployeeDetails = employeeList.find((employee) => {
+        return employee.id === id ? employee : null;
+    });
+    console.log("getEmployeeDetails ::", getEmployeeDetails);
+    res.json({ data: getEmployeeDetails });
+});
 app.listen(port, () => {
     console.log("app Running...");
 });

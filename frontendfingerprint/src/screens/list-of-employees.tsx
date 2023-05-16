@@ -9,8 +9,11 @@ import {
 } from "@ionic/react"
 import axios from "axios"
 import {performBiometricVerificatin} from "../service/finger-print"
+import {useHistory} from "react-router-dom"
 
 const ListOfEmployees: React.FC<any> = () => {
+	const history = useHistory()
+
 	const employeeList = [
 		{
 			id: "1232",
@@ -29,12 +32,25 @@ const ListOfEmployees: React.FC<any> = () => {
 	const [showRegisterFingerPrnt, setShowRegisterFingerPrnt] =
 		React.useState<boolean>(false)
 
+	const [showLoginFingerPrnt, setShowLoginFingerPrnt] =
+		React.useState<boolean>(false)
+
 	const handleClickEmployee = (employeeId: string) => async (e: any) => {
 		console.log("employeeId :::=> ", employeeId)
 		const response = await axios
-			.get(`http://localhost:5000/${employeeId}`)
+			.get(`http://192.168.10.33:5000/${employeeId}`)
 			.then((value: any) => value.data)
 		console.log("response :::", response)
+
+		if (response.data) {
+			const {id, name, fingerPrint} = response.data
+			//user finger print exists show login screen or register finger print screen
+			history.push(
+				!!fingerPrint
+					? `/login?id=${id}&name=${name}`
+					: `/register?id=${id}&name=${name}`
+			)
+		}
 	}
 
 	const getFingerPrintStatus = async () => {
