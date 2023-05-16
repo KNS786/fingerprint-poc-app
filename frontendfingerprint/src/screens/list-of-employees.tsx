@@ -65,7 +65,7 @@ const ListOfEmployees: React.FC<any> = () => {
 							<div
 								key={id}
 								onClick={handleClickEmployee(id)}
-								className="flex w-full h-5 py-6 border-b-[1px] ">
+								className="flex w-full h-5 py-6 border-b-[1px]">
 								{" "}
 								<p className="flex text-center">{name}</p>
 							</div>
