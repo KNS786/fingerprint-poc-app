@@ -5,10 +5,14 @@ import cors from "cors"
 dotenv.config()
 
 const app: Express = express()
-const port = process.env.PORT
+const port: any = process.env.PORT
 
 app.use(cors())
 app.use(express.json())
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*")
+	next()
+})
 
 const employeeList: any = [
 	{

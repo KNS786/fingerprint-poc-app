@@ -37,12 +37,23 @@ const ListOfEmployees: React.FC<any> = () => {
 
 	const handleClickEmployee = (employeeId: string) => async (e: any) => {
 		console.log("employeeId :::=> ", employeeId)
-		const response = await axios
-			.get(`http://192.168.10.33:5000/${employeeId}`)
-			.then((value: any) => value.data)
-		console.log("response :::", response)
+		let response: any = null
+		try {
+			response = await axios
+				.get(`https://6f8c-157-46-213-29.in.ngrok.io/${employeeId}`)
+				.then((value: any) => {
+					console.log("value data ::: =>", value.data)
+					return value.data
+				})
+				.catch((error: any) => {
+					console.log("axios error value :::", error)
+				})
+			console.log("response :::", response)
+		} catch (error) {
+			console.log("error response :::", error)
+		}
 
-		if (response.data) {
+		if (response?.data) {
 			const {id, name, fingerPrint} = response.data
 			//user finger print exists show login screen or register finger print screen
 			history.push(
