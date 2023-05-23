@@ -17,7 +17,7 @@ const RegisterFingerPrint: React.FC<any> = () => {
 		<IonPage>
 			<IonHeader>
 				<IonToolbar>
-					<IonTitle>Register Finger Print</IonTitle>
+					<IonTitle>Login Finger Print</IonTitle>
 				</IonToolbar>
 			</IonHeader>
 			<IonContent className="ion-padding">

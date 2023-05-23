@@ -32,6 +32,7 @@ import "@ionic/react/css/flex-utils.css"
 import "@ionic/react/css/display.css"
 import ListOfEmployees from "../src/screens/list-of-employees"
 import RegisterFingerPrint from "./screens/register-fingerprint"
+import LoginFingerPrint from "./screens/login-fingerprint"
 
 /* Theme variables */
 import "./theme/variables.css"
@@ -53,8 +54,8 @@ const App: React.FC = () => (
 					path="/register">
 					<RegisterFingerPrint />
 				</Route>
-				<Route path="/tab3">
-					<Tab3 />
+				<Route path="/login">
+					<LoginFingerPrint />
 				</Route>
 				<Route
 					exact
