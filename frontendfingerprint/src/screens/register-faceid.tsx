@@ -31,8 +31,7 @@ const RegisterFaceId: React.FC<any> = () => {
 	return (
 		<IonContent>
 			<div>
-				<h1>Camera Example</h1>
-				<button onClick={takePhoto}>Take Photo</button>
+				<button onClick={takePhoto}>Register</button>
 				{/* {imageUrl && (
 					<img
 						src={imageUrl}
