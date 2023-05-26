@@ -8,7 +8,7 @@ import {Capacitor} from "@capacitor/core"
 import axios from "axios"
 import {BASE_URL, API_KEY} from "../azure-config"
 
-import {uploadFile} from "../utils/uploadFile"
+// import {uploadFile} from "../utils/uploadFile"
 
 async function base64FromPath(path: string): Promise<string> {
 	const response = await fetch(path)
@@ -29,14 +29,11 @@ async function base64FromPath(path: string): Promise<string> {
 
 const savePicture = async (photo: Photo, fileName: string): Promise<any> => {
 	const base64Data = await base64FromPath(photo.webPath!)
-	console.log("base425 ::: =>", base64Data)
-	console.log("Directory :::", Directory)
 	const savedFile = await Filesystem.writeFile({
 		path: fileName,
 		data: base64Data,
 		directory: Directory.Data,
 	})
-	console.log("savedFile ::", savedFile)
 
 	// Use webPath to display the new image instead of base64 since it's
 	// already loaded into memory
@@ -49,7 +46,7 @@ const savePicture = async (photo: Photo, fileName: string): Promise<any> => {
 }
 
 export function usePhotoGallery() {
-	const [photos, setPhotos] = useState<UserPhoto[]>([])
+	const [photos, setPhotos] = useState<any>([])
 
 	const takePhoto = async () => {
 		try {
@@ -71,6 +68,7 @@ export function usePhotoGallery() {
 			// uploadFile(photo.webPath)
 
 			const savePic = await savePicture(photo, fileName)
+			console.log("savePic :::", savePic)
 
 			// const fileContent = await Filesystem.readFile({
 			// 	path: savePic.uri,
@@ -81,23 +79,24 @@ export function usePhotoGallery() {
 
 			// const formData = new FormData()
 			// formData.append("blob", savePic.base64Data)
-			let data = JSON.stringify({
-				url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTl25JcRqr0up0biB1eQWTfdZP3mhHwa9ZZQ&usqp=CAU",
-			})
+			// let data = JSON.stringify({
+			// 	url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTl25JcRqr0up0biB1eQWTfdZP3mhHwa9ZZQ&usqp=CAU",
+			// })
 
-			const azureResponse = await axios.post(
-				`${BASE_URL}/face/v1.0/detect?returnFaceId=true`,
-				data,
-				{
-					headers: {
-						"Content-type": "application/json",
-						"Ocp-Apim-Subscription-Key": API_KEY,
-					},
-				}
-			)
-			console.log("azureResponse :::", azureResponse)
+			// const azureResponse = await axios.post(
+			// 	`${BASE_URL}/face/v1.0/detect?returnFaceId=true`,
+			// 	data,
+			// 	{
+			// 		headers: {
+			// 			"Content-type": "application/json",
+			// 			"Ocp-Apim-Subscription-Key": API_KEY,
+			// 		},
+			// 	}
+			// )
+			// console.log("azureResponse :::", azureResponse)
 
-			return azureResponse.data.imageUrl
+			// return azureResponse.data.imageUrl
+			return photos
 		} catch (error) {
 			console.error("Error taking photo", error)
 		}

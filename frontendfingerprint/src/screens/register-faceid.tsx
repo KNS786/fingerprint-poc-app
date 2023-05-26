@@ -41,7 +41,7 @@ const RegisterFaceId: React.FC<any> = () => {
 				)} */}
 				<IonGrid>
 					<IonRow>
-						{photos.map((photo, index) => (
+						{photos.map((photo: any, index: number) => (
 							<IonCol
 								size="6"
 								key={photo.filepath}>

@@ -6,6 +6,8 @@ from flask import Flask,request,jsonify
 import time
 import json
 import os
+import base64
+from io import BytesIO
 
 # Create a Flask application
 app = Flask(__name__)
@@ -14,9 +16,27 @@ app = Flask(__name__)
 def home():
     return {'msg':True}
 
+
+def convert_base64_to_image(folderPath,imgWithExtn):
+    imgData = request.json.get('image_data')
+    print('data :::',imgData)
+
+    _, encoded_data = imgData.split(',', 1)
+    image_bytes = base64.b64decode(encoded_data)
+
+    # Create a PIL Image object from the decoded bytes
+    image = Image.open(BytesIO(image_bytes))
+   
+
+    image.save(folderPath+imgWithExtn,'PNG')
+    
+    return True
+    
+
 @app.route('/register',methods=['POST'])
 def register():
     folder_path = '/home/navani/Desktop/test/'
+
     # Check if the folder exists
     if os.path.exists(folder_path):
         file_list = os.listdir(folder_path)
@@ -32,17 +52,11 @@ def register():
     else:
         print('folder does not exists')
         
-    if 'file' not in request.files:
-        return "No file selected", 400
-    
-    file = request.files['file']
-
-    if file.filename == '':
-        return 'No file selected',400
-    
-    if file:
-        file.save(folder_path+file.filename)
-    return jsonify({'msg':'register faceid successfully'})
+    result = convert_base64_to_image(folder_path,'register.png')
+    if result :
+        return jsonify({'msg':'register faceid successfully'})
+    else:
+        return jsonify({'msg':'No file selected'}),400
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -52,7 +66,7 @@ def login():
         if file_list:
             for file_name in file_list:
                 file_path = os.path.join(folder_path,file_name)
-                if file_name == 'login.jpg':
+                if file_name == 'login.png':
                     os.remove(file_path)
                     print("deleted file successfully")
         else:
@@ -60,24 +74,19 @@ def login():
     else:
         print('folder does not exists')
     
-    if 'file' not in request.files:
-        return 'No file selected',400
-    
-    file = request.files['file']
+    result = convert_base64_to_image(folder_path,'register.png')
+    if result :
+        return jsonify({'msg':'login faceid uploaded'})
+    else:
+        return jsonify({'msg':'No file selected'}),400
 
-    if file.filename == '':
-        return 'No file selected',400
-    
-    if file:
-        file.save(folder_path+file.filename)
-    return jsonify({'msg':'login faceid uploaded'})
 
 
 
 
 @app.route('/verify')
 def verifyFace():
-    folder_path = '/home/navani/Desktop/images/'
+    folder_path = '/home/navani/Desktop/test/'
     loginJpg=False
     registerJpg=False
     if os.path.exists(folder_path):
@@ -86,9 +95,9 @@ def verifyFace():
             for file_name in file_list:
                 file_path = os.path.join(folder_path,file_name)
                 print('file_name ::',file_name)
-                if file_name == 'login.jpg':
+                if file_name == 'login.png':
                     loginJpg=True
-                elif file_name == 'register.jpg':
+                elif file_name == 'register.png':
                     registerJpg=True
         else:
             print('file list not found')
@@ -97,8 +106,8 @@ def verifyFace():
 
     if loginJpg and registerJpg:
         # Load the two input images
-        image1 = face_recognition.load_image_file(folder_path+'register.jpg')
-        image2 = face_recognition.load_image_file(folder_path+'login.jpg')
+        image1 = face_recognition.load_image_file(folder_path+'register.png')
+        image2 = face_recognition.load_image_file(folder_path+'login.png')
         # Find and encode the face in image 1
         face_locations1 = face_recognition.face_locations(image1)
         face_encodings1 = face_recognition.face_encodings(image1, face_locations1)
