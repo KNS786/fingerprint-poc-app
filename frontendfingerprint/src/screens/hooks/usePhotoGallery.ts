@@ -45,8 +45,33 @@ const savePicture = async (photo: Photo, fileName: string): Promise<any> => {
 	}
 }
 
-export function usePhotoGallery() {
+const uploadPhoto = async ({base64Data}: any, route: string) => {
+	const response = await axios
+		.post(
+			`http://127.0.0.1:5000/${route}`,
+			{
+				image_data: base64Data,
+			},
+			{
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
+		)
+		.then((resp: any) => resp.data)
+	console.log("response :::", response)
+}
+
+const verifyPicture = async () => {
+	const response = await axios
+		.get("http://127.0.0.1:5000/verify")
+		.then((resp: any) => resp.data)
+	return {faceMatched: response.faceMatched === "True"}
+}
+
+export function usePhotoGallery(screen) {
 	const [photos, setPhotos] = useState<any>([])
+	const [isFaceMatched, setFaceMatched] = useState<boolean>(false)
 
 	const takePhoto = async () => {
 		try {
@@ -69,6 +94,11 @@ export function usePhotoGallery() {
 
 			const savePic = await savePicture(photo, fileName)
 			console.log("savePic :::", savePic)
+			await uploadPhoto(savePic, screen)
+			if (screen === "login") {
+				const verifyPicture = await verifyPicture()
+				setFaceMatched(verifyPicture.faceMatched)
+			}
 
 			// const fileContent = await Filesystem.readFile({
 			// 	path: savePic.uri,

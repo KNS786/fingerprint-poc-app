@@ -8,9 +8,13 @@ import json
 import os
 import base64
 from io import BytesIO
+from flask_cors import CORS
+
 
 # Create a Flask application
 app = Flask(__name__)
+CORS(app)
+CORS(app, origins='http://localhost:3000', methods=['GET', 'POST'], allow_headers=['Content-Type'])
 
 @app.route("/")
 def home():
@@ -19,7 +23,6 @@ def home():
 
 def convert_base64_to_image(folderPath,imgWithExtn):
     imgData = request.json.get('image_data')
-    print('data :::',imgData)
 
     _, encoded_data = imgData.split(',', 1)
     image_bytes = base64.b64decode(encoded_data)
@@ -74,7 +77,7 @@ def login():
     else:
         print('folder does not exists')
     
-    result = convert_base64_to_image(folder_path,'register.png')
+    result = convert_base64_to_image(folder_path,'login.png')
     if result :
         return jsonify({'msg':'login faceid uploaded'})
     else:
@@ -125,7 +128,8 @@ def verifyFace():
     
         time.sleep(3)
         data = {
-            'faceMatched':  abs(match_percentage) > 60
+            'faceMatched':  abs(match_percentage) > 60,
+            'accuracy': match_percentage
         }
 
         # Print the match percentage

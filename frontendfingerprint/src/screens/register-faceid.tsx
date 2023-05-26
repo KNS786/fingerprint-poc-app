@@ -26,7 +26,7 @@ const RegisterFaceId: React.FC<any> = () => {
 	// 	}
 	// }
 
-	const {photos, takePhoto} = usePhotoGallery()
+	const {photos, takePhoto} = usePhotoGallery("register")
 
 	return (
 		<IonContent>

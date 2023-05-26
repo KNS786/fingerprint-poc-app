@@ -37,6 +37,7 @@ import LoginFingerPrint from "./screens/login-fingerprint"
 /* Theme variables */
 import "./theme/variables.css"
 import RegisterFaceId from "./screens/register-faceid"
+import LoginFaceId from "./screens/login-faceid"
 
 setupIonicReact()
 
@@ -56,7 +57,7 @@ const App: React.FC = () => (
 					<RegisterFaceId />
 				</Route>
 				<Route path="/login">
-					<LoginFingerPrint />
+					<LoginFaceId />
 				</Route>
 				<Route
 					exact
