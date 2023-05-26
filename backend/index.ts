@@ -2,7 +2,11 @@ import express, {Express, Request, Response} from "express"
 import dotenv from "dotenv"
 import cors from "cors"
 
+import compareFaces from "./face-recognition/compare-faces"
+
 dotenv.config()
+
+compareFaces()
 
 const app: Express = express()
 const port: any = process.env.PORT

@@ -58,6 +58,7 @@ export function usePhotoGallery() {
 				source: CameraSource.Camera,
 				quality: 100,
 			})
+			console.log("photo :::", photo)
 			const fileName = new Date().getTime() + ".jpeg"
 			const newPhotos = [
 				{
