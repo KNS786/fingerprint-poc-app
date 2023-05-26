@@ -26,7 +26,7 @@ const LoginFaceId: React.FC<any> = () => {
 	// 	}
 	// }
 
-	const {photos, takePhoto} = usePhotoGallery("login")
+	const {photos, takePhoto, isFaceMatched} = usePhotoGallery("login")
 
 	return (
 		<IonContent>
@@ -50,6 +50,13 @@ const LoginFaceId: React.FC<any> = () => {
 						))}
 					</IonRow>
 				</IonGrid>
+				<div className="flex flex-col">
+					{isFaceMatched?.msg && <p>{isFaceMatched?.msg}</p>}
+
+					{isFaceMatched?.accuracy && (
+						<p>accuracy : {isFaceMatched.accuracy}</p>
+					)}
+				</div>
 			</div>
 		</IonContent>
 	)

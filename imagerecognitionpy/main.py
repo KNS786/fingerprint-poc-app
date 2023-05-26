@@ -127,9 +127,11 @@ def verifyFace():
             match_percentage = 0.0
     
         time.sleep(3)
+        result = 'Your Face Matched' if abs(match_percentage) > 60 else 'Your Face Not Matched'
         data = {
             'faceMatched':  abs(match_percentage) > 60,
-            'accuracy': match_percentage
+            'accuracy': match_percentage,
+            'msg': result
         }
 
         # Print the match percentage

@@ -60,18 +60,20 @@ const uploadPhoto = async ({base64Data}: any, route: string) => {
 		)
 		.then((resp: any) => resp.data)
 	console.log("response :::", response)
+	return response
 }
 
 const verifyPicture = async () => {
 	const response = await axios
 		.get("http://127.0.0.1:5000/verify")
 		.then((resp: any) => resp.data)
-	return {faceMatched: response.faceMatched === "True"}
+	return response
 }
 
-export function usePhotoGallery(screen) {
+export function usePhotoGallery(screen: any) {
 	const [photos, setPhotos] = useState<any>([])
-	const [isFaceMatched, setFaceMatched] = useState<boolean>(false)
+	const [isFaceMatched, setFaceMatched] = useState<any>(undefined)
+	const [register, setRegister] = useState<any>("")
 
 	const takePhoto = async () => {
 		try {
@@ -94,10 +96,16 @@ export function usePhotoGallery(screen) {
 
 			const savePic = await savePicture(photo, fileName)
 			console.log("savePic :::", savePic)
-			await uploadPhoto(savePic, screen)
-			if (screen === "login") {
-				const verifyPicture = await verifyPicture()
-				setFaceMatched(verifyPicture.faceMatched)
+			const response = await uploadPhoto(savePic, screen)
+			console.log("response :::", response)
+			console.log("screen ::", screen)
+			if (response && screen === "login") {
+				const verifyedPicture: any = await verifyPicture()
+				setFaceMatched(verifyedPicture)
+			}
+
+			if (response && screen === "register") {
+				setRegister(response.msg)
 			}
 
 			// const fileContent = await Filesystem.readFile({
@@ -135,5 +143,7 @@ export function usePhotoGallery(screen) {
 	return {
 		takePhoto,
 		photos,
+		isFaceMatched,
+		register,
 	}
 }

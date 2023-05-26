@@ -8,9 +8,11 @@ import {Camera, CameraResultType, CameraSource, Photo} from "@capacitor/camera"
 import {Filesystem, Directory} from "@capacitor/filesystem"
 import {Preferences} from "@capacitor/preferences"
 import {Capacitor} from "@capacitor/core"
+import {useHistory} from "react-router-dom"
 
 const RegisterFaceId: React.FC<any> = () => {
 	const [imageUrl, setImageUrl] = useState("")
+	const history = useHistory()
 
 	// const takePhoto = async () => {
 	// 	try {
@@ -26,7 +28,8 @@ const RegisterFaceId: React.FC<any> = () => {
 	// 	}
 	// }
 
-	const {photos, takePhoto} = usePhotoGallery("register")
+	const {photos, takePhoto, register} = usePhotoGallery("register")
+	console.log("register ::", register)
 
 	return (
 		<IonContent>
@@ -50,6 +53,18 @@ const RegisterFaceId: React.FC<any> = () => {
 						))}
 					</IonRow>
 				</IonGrid>
+				{register && (
+					<>
+						<p>{register}</p>
+						<button
+							onClick={(e: any) => {
+								history.push("/login")
+							}}>
+							{" "}
+							Go To Login
+						</button>
+					</>
+				)}
 			</div>
 		</IonContent>
 	)
