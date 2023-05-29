@@ -10,6 +10,8 @@ import base64
 from io import BytesIO
 from flask_cors import CORS
 import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import tensorflow as tf
 
 
 # Create a Flask application
@@ -90,11 +92,11 @@ def register():
     convertBase64ToFile = convert_base64_to_image(folder_path,'register.png')
     result = croppedFaceInImage(folder_path,'register.png','register_face.png')
     print("result ::",result)
-    
+
     if result :
         return jsonify({'msg':'register faceid successfully'})
     else:
-        return jsonify({'msg':'No file selected'}),400
+        return jsonify({'msg':'face is not detected'}),400
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -104,7 +106,7 @@ def login():
         if file_list:
             for file_name in file_list:
                 file_path = os.path.join(folder_path,file_name)
-                if file_name == 'login.png':
+                if file_name == 'login.png' or file_name == 'login_face.png':
                     os.remove(file_path)
                     print("deleted file successfully")
         else:
@@ -112,13 +114,63 @@ def login():
     else:
         print('folder does not exists')
     
-    result = convert_base64_to_image(folder_path,'login.png')
+    convertBase64ToFile = convert_base64_to_image(folder_path,'login.png')
+    print("folder_path ::",folder_path)
+    time.sleep(3)
+    result = croppedFaceInImage(folder_path,'login.png','login_face.png')
+    print("login result :::",result)
+
     if result :
         return jsonify({'msg':'login faceid uploaded'})
     else:
         return jsonify({'msg':'No file selected'}),400
 
 
+def verifyImage(folder_path,register_faceimg,login_faceimg):
+    # Load the pre-trained face detection model provided by OpenCV
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    # Load the pre-trained FaceNet model for face recognition
+    facenet = cv2.dnn.readNetFromTensorflow('../imagerecognitionpy/pre-trained-model/tensorflow-face-detection-master/model/frozen_inference_graph_face.pb')
+
+    # Load the two face images to compare 
+    image1 = cv2.imread(folder_path+register_faceimg)
+    image2 = cv2.imread(folder_path+login_faceimg)
+
+    # Convert the images to grayscale for face detection
+    gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+    gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the grayscale images
+    faces1 = face_cascade.detectMultiScale(gray1, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    faces2 = face_cascade.detectMultiScale(gray2, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    # Assuming there is only one face in each image, extract the face regions
+    (x1, y1, w1, h1) = faces1[0]
+    (x2, y2, w2, h2) = faces2[0]
+
+    # Crop the face regions from the original images
+    face1 = image1[y1:y1+h1, x1:x1+w1]
+    face2 = image2[y2:y2+h2, x2:x2+w2]
+
+    # Preprocess the face images for FaceNet
+    preprocessed_face1 = cv2.dnn.blobFromImage(face1, 1.0, (160, 160), (104.0, 177.0, 123.0), swapRB=True)
+    preprocessed_face2 = cv2.dnn.blobFromImage(face2, 1.0, (160, 160), (104.0, 177.0, 123.0), swapRB=True)
+
+    # Run the preprocessed face images through FaceNet to get face embeddings
+    facenet.setInput(preprocessed_face1)
+    embeddings1 = facenet.forward()
+
+    facenet.setInput(preprocessed_face2)
+    embeddings2 = facenet.forward()
+
+    # Calculate cosine similarity between the face embeddings
+    similarity = cosine_similarity(embeddings1, embeddings2)[0][0]
+
+    # Calculate matching percentage
+    matching_percentage = round(similarity * 100, 2)
+    # Print the matching percentage
+    print("Matching percentage:", matching_percentage, "%")
 
 
 
@@ -133,9 +185,9 @@ def verifyFace():
             for file_name in file_list:
                 file_path = os.path.join(folder_path,file_name)
                 print('file_name ::',file_name)
-                if file_name == 'login.png':
+                if file_name == 'login_face.png':
                     loginJpg=True
-                elif file_name == 'register.png':
+                elif file_name == 'register_face.png':
                     registerJpg=True
         else:
             print('file list not found')
@@ -144,8 +196,8 @@ def verifyFace():
 
     if loginJpg and registerJpg:
         # Load the two input images
-        image1 = face_recognition.load_image_file(folder_path+'register.png')
-        image2 = face_recognition.load_image_file(folder_path+'login.png')
+        image1 = face_recognition.load_image_file(folder_path+'register_face.png')
+        image2 = face_recognition.load_image_file(folder_path+'login_face.png')
         # Find and encode the face in image 1
         face_locations1 = face_recognition.face_locations(image1)
         face_encodings1 = face_recognition.face_encodings(image1, face_locations1)
@@ -153,6 +205,16 @@ def verifyFace():
         # Find and encode the face in image 2
         face_locations2 = face_recognition.face_locations(image2)
         face_encodings2 = face_recognition.face_encodings(image2, face_locations2)
+
+        # biden_encoding = face_recognition.face_encodings(image1)[0]
+        # unknown_encoding = face_recognition.face_encodings(image2)[0]
+
+        # results = face_recognition.compare_faces([biden_encoding], unknown_encoding)
+
+        # print("verify :::",results)
+
+        # verifyImage(folder_path,'register_face.png','login_face.png')
+        
        
         # Compare the face encodings
         if len(face_encodings1) > 0 and len(face_encodings2) > 0:
