@@ -9,6 +9,7 @@ import os
 import base64
 from io import BytesIO
 from flask_cors import CORS
+import numpy as np
 
 
 # Create a Flask application
@@ -34,6 +35,37 @@ def convert_base64_to_image(folderPath,imgWithExtn):
     image.save(folderPath+imgWithExtn,'PNG')
     
     return True
+
+def croppedFaceInImage(folder_path,read_file_name,face_filename):
+    try:
+        image = cv2.imread(folder_path+read_file_name)
+
+        # Load the pre-trained face detection model provided by OpenCV
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+        # Convert the image to grayscale for face detection
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the grayscale image
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+        # Assuming there is only one face in the image, extract the coordinates of the face region
+        (x, y, w, h) = faces[0]
+        # Crop the face region from the original image
+        face_image = image[y:y+h, x:x+w]
+
+        # Save the cropped face as a PNG file
+        output_file= face_filename
+        # Create the custom folder if it doesn't exist
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path,output_file)
+        # Save the cropped face as a PNG file in the custom folder path
+        write_faceImage = cv2.imwrite(file_path,face_image)
+        print("cropped file ::",file_path)
+        return write_faceImage
+    except Exception as e:
+        return False
+
     
 
 @app.route('/register',methods=['POST'])
@@ -55,7 +87,10 @@ def register():
     else:
         print('folder does not exists')
         
-    result = convert_base64_to_image(folder_path,'register.png')
+    convertBase64ToFile = convert_base64_to_image(folder_path,'register.png')
+    result = croppedFaceInImage(folder_path,'register.png','register_face.png')
+    print("result ::",result)
+    
     if result :
         return jsonify({'msg':'register faceid successfully'})
     else:
